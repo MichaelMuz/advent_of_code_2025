@@ -13,6 +13,7 @@ def run(f: Iterable):
         count %= 100
         if count == 0:
             ans += 1
+    return ans
 
 
 if __name__ == "__main__":
@@ -36,4 +37,5 @@ if __name__ == "__main__":
     )
 
     with open("input.txt") as f:
-        run(f)
+        res = run(f)
+    print(res)
