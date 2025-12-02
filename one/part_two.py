@@ -14,10 +14,10 @@ def run(f: Iterable):
         past_0 = abs(past_0)
         if number < 0:
             if count == 0:
-                # starting at 0 and going left should be -1 to what mod said
+                # starting at 0 and going left should be -1 to what div said
                 past_0 -= 1
             elif new_count == 0:
-                # also ending at zero after left should be + 1 to what mod said
+                # also ending at zero after left should be + 1 to what div said
                 past_0 += 1
 
         count = new_count
