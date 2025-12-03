@@ -19,32 +19,48 @@ def get_invalid_ids(lower: int, upper: int):
     if upper_digs % 2 == 1:
         upper = 10 ** (upper_digs - 1) - 1
 
+    lower_str = str(lower)
+    upper_str = str(upper)
+
     if lower > upper:
         return []
 
-    print("lower: ", lower, "upper: ", upper)
-
-    lower_str = str(lower)
     first_half_lower = lower_str[: len(lower_str) // 2]
-
-    upper_str = str(upper)
     first_half_upper = upper_str[: len(upper_str) // 2]
 
-    # print(
-    #     "first_half_lower: ", first_half_lower, "first_half_upper: ", first_half_upper
-    # )
+    # print("lower: ", lower, "upper: ", upper)
 
-    pos_per_spot = []
-    for f_dig_l, f_dig_u in zip(first_half_lower, first_half_upper, strict=True):
-        pos_per_spot.append([i for i in range(int(f_dig_l), int(f_dig_u) + 1)])
-    print("pos per spot", pos_per_spot)
+    all_nums = []
 
-    return list(
-        filter(
-            lambda x: lower <= x <= upper,
-            (int("".join(map(str, s)) * 2) for s in itertools.product(*pos_per_spot)),
-        )
-    )
+    def rec(acc: list, at_lower: bool, at_upper: bool):
+        if len(acc) == len(first_half_lower):
+            num = int("".join(acc) * 2)
+            if lower <= num <= upper:
+                all_nums.append(num)
+            return
+
+        low = 0
+        if at_lower:
+            low = int(first_half_lower[len(acc)])
+            # print("actual low", low)
+
+        up = 9
+        if at_upper:
+            up = int(first_half_upper[len(acc)])
+            # print("actual up", up)
+
+        for i in range(low, up + 1):
+            acc.append(str(i))
+            rec(
+                acc,
+                at_lower and i == low,
+                at_upper and i == up,
+            )
+            acc.pop()
+
+    rec([], True, True)
+
+    return all_nums
 
 
 def invalid_ids_dumb(lower: int, upper: int):
@@ -70,7 +86,7 @@ if __name__ == "__main__":
     for lower, upper, exp in exps:
         invs = get_invalid_ids(lower, upper)
         dumb_invs = invalid_ids_dumb(lower, upper)
-        print("invalid ids found:", invs, "invalid ids expected:", exp)
+        # print("invalid ids found:", invs, "invalid ids expected:", exp)
         assert invs == exp == dumb_invs
 
     assert (
@@ -88,10 +104,13 @@ if __name__ == "__main__":
         lower, _, upper = chunk.partition("-")
         invs = get_invalid_ids(int(lower), int(upper))
         invs_dumb = invalid_ids_dumb(int(lower), int(upper))
-        # assert invs == invs_dumb
-        if invs != invs_dumb:
-            print(chunk)
-            print("invs: ", invs, "invs dumb: ", invs_dumb)
-            break
+        assert invs == invs_dumb
+        # if invs != invs_dumb:
+        #     print(chunk)
+        #     print("lower    : ", [int(lower)] * len(invs))
+        #     print("upper    : ", [int(upper)] * len(invs))
+        #     print("invs     : ", invs)
+        #     print("invs dumb: ", invs_dumb)
+        #     break
         ans.extend(invs)
     print(sum(ans))
